@@ -12,7 +12,6 @@ import java.util.Set;
 @Builder
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = "developers")      // avoid huge / recursive toString
 @Table(name = "skill")
 public class SkillEntity {
     @Id

@@ -34,4 +34,7 @@ public class DeveloperEntity {
     @OneToMany(mappedBy = "developer")
     private List<TaskEntity> tasks; // Optional: To see which tasks this dev is assigned to
 
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private UserEntity user;
 }
