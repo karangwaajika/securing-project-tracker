@@ -65,7 +65,7 @@ public class GlobalException {
 
     @ExceptionHandler(DeveloperNotFoundException.class)
     public ResponseEntity<?> handleDeveloperNotFound(DeveloperNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Map.of("Error", e.getMessage()));
     }
 

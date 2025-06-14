@@ -3,6 +3,7 @@ package com.lab.securing_project_tracker.service.impl;
 import com.lab.securing_project_tracker.dto.authentication.UserRegisterDto;
 import com.lab.securing_project_tracker.dto.authentication.UserResponseDto;
 import com.lab.securing_project_tracker.dto.developer.DeveloperDto;
+import com.lab.securing_project_tracker.exception.DeveloperNotFoundException;
 import com.lab.securing_project_tracker.exception.UserExistsException;
 import com.lab.securing_project_tracker.mapper.DeveloperMapper;
 import com.lab.securing_project_tracker.mapper.UserMapper;
@@ -43,6 +44,10 @@ public class UserServiceImpl implements UserService {
         }
         //extract a developer dto to convert it to developer entity
         DeveloperDto developerDto = userDto.getDeveloper();
+        if(developerDto == null){
+            throw new DeveloperNotFoundException("A user must have an associated class with it, " +
+                                                 "cannot create user alone!");
+        }
         Set<SkillEntity> skills = new HashSet<>(skillService.findAllById(developerDto.getSkillIds()));
         DeveloperEntity developerEntity = DeveloperMapper.toEntity(developerDto, skills);
 

@@ -18,5 +18,4 @@ public class DeveloperResponseDto {
     private String name;
     private String email;
     private Set<SkillResponseDto> skills;
-    private UserEntity user;
 }
