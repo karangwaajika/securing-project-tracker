@@ -33,6 +33,12 @@ public class GlobalException {
                 .body(Map.of("Error", e.getMessage()));
     }
 
+    @ExceptionHandler(UserExistsException.class)
+    public ResponseEntity<?> handleTaskExists(UserExistsException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("Error", e.getMessage()));
+    }
+
     @ExceptionHandler(TaskNotFoundException.class)
     public ResponseEntity<?> handleTaskNotFound(TaskNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
