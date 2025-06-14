@@ -1,5 +1,6 @@
 package com.lab.securing_project_tracker.dto.authentication;
 
+import com.lab.securing_project_tracker.dto.developer.DeveloperResponseDto;
 import com.lab.securing_project_tracker.model.DeveloperEntity;
 import com.lab.securing_project_tracker.util.Role;
 import lombok.AllArgsConstructor;
@@ -15,5 +16,5 @@ public class UserResponseDto {
     private Long id;
     private String username;
     private Role role;
-    private DeveloperEntity developer;
+    private DeveloperResponseDto developer;
 }
