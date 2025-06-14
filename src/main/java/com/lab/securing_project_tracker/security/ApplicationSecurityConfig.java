@@ -1,15 +1,16 @@
-package com.exercise.authentication.security;
+package com.lab.securing_project_tracker.security;
 
-import com.exercise.authentication.security.jwt.JwtAuthenticationFilter;
-import com.exercise.authentication.security.jwt.JwtAuthorizationFilter;
-import com.exercise.authentication.security.jwt.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.lab.securing_project_tracker.security.jwt.JwtAuthenticationFilter;
+import com.lab.securing_project_tracker.security.jwt.JwtAuthorizationFilter;
+import com.lab.securing_project_tracker.security.jwt.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,29 +19,36 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class ApplicationSecurityConfig {
-    @Autowired
-    private JwtUtil jwtUtil;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
+
+    public ApplicationSecurityConfig(JwtUtil jwtUtil,
+                                     UserDetailsService userDetailsService) {
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
+        httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests ->
-                        requests.requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers(
+                        requests.requestMatchers(
+                                        "/auth/**",
+                                        "/projects/**",
+                                        "/skills/**",
+                                        "/developers/**",
+                                        "/tasks/**",
+                                        "/logs/**",
                                         "/v3/api-docs/**",
                                         "/swagger-ui.html",
                                         "/swagger-ui/**"
                                 ).permitAll()
-                                .requestMatchers("/resource/secure/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/resource/secure/user/**").hasAnyRole("USER", "ADMIN")
                                 .anyRequest()
                                 .authenticated()
                 )
                 .headers(headers -> headers
-                        .frameOptions(frameOptions -> frameOptions.sameOrigin())  // Allow frames from the same origin
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)  // Allow frames from the same origin
                 )
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(httpSecurity.getSharedObject(AuthenticationConfiguration.class)), jwtUtil))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(httpSecurity.getSharedObject(AuthenticationConfiguration.class)), jwtUtil, userDetailsService));

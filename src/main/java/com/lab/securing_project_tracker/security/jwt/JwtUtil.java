@@ -1,4 +1,4 @@
-package com.exercise.authentication.security.jwt;
+package com.lab.securing_project_tracker.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

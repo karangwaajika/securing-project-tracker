@@ -1,4 +1,4 @@
-package com.exercise.authentication.security.jwt;
+package com.lab.securing_project_tracker.security.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,7 +18,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil,
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager,
+                                  JwtUtil jwtUtil,
                                   UserDetailsService userDetailsService) {
         super(authenticationManager);
         this.jwtUtil = jwtUtil;
@@ -26,7 +27,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain)
+            throws IOException, ServletException {
         String header = request.getHeader("Authorization");
         if (Objects.isNull(header) || !header.startsWith("Bearer ")) {
             chain.doFilter(request, response);
@@ -44,8 +48,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             String username = jwtUtil.extractUsernameFromToken(token.replace("Bearer ", ""));
             if (Objects.nonNull(username)) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (jwtUtil.validateToken(token.replace("Bearer ", ""), userDetails)) {
-                    authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                if (jwtUtil.validateToken(token.replace("Bearer ", ""),
+                        userDetails)) {
+                    authentication = new UsernamePasswordAuthenticationToken(userDetails,
+                            null,
+                            userDetails.getAuthorities());
                 }
             }
         }
