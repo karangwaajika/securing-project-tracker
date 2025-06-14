@@ -5,7 +5,9 @@ import com.lab.securing_project_tracker.security.jwt.JwtAuthorizationFilter;
 import com.lab.securing_project_tracker.security.jwt.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,7 +31,9 @@ public class ApplicationSecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    // API CHAIN
     @Bean
+    @Order(1)
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests ->
@@ -53,6 +57,32 @@ public class ApplicationSecurityConfig {
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(httpSecurity.getSharedObject(AuthenticationConfiguration.class)), jwtUtil))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(httpSecurity.getSharedObject(AuthenticationConfiguration.class)), jwtUtil, userDetailsService));
         return httpSecurity.build();
+    }
+
+
+    //  WEB / OAUTH2 CHAIN
+    @Bean
+    @Order(2)
+    SecurityFilterChain webChain(HttpSecurity http) throws Exception {
+
+        http.authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/css/**", "/js/**","/webjars/**", "/images/**",
+                                "/login", "/oauth2/**").permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(form -> form.loginPage("/login"))       // optional classic login
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")                         // same page
+                        .defaultSuccessUrl("/home", true)
+                        .failureUrl("/login?error"))
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true));
+
+        // Browser chain keeps default session + CSRF settings
+
+        return http.build();
     }
 
     @Bean
