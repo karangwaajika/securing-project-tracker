@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,22 +36,16 @@ public class ApplicationSecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(requests ->
-                        requests.requestMatchers(
-                                        "/auth/**",
-                                        "/projects/**",
-                                        "/skills/**",
-                                        "/developers/**",
-                                        "/tasks/**",
-                                        "/logs/**",
-                                        "/v3/api-docs/**",
-                                        "/swagger-ui.html",
-                                        "/swagger-ui/**"
-                                ).permitAll()
-                                .anyRequest()
-                                .authenticated()
-                )
+        httpSecurity.securityMatcher("/api/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(sm -> sm
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html", "/swagger-ui/**")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)  // Allow frames from the same origin
                 )
@@ -63,7 +58,7 @@ public class ApplicationSecurityConfig {
     //  WEB / OAUTH2 CHAIN
     @Bean
     @Order(2)
-    SecurityFilterChain webChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain webChain(HttpSecurity http) throws Exception {
 
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers(
