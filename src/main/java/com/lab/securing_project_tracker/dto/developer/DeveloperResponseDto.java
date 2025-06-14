@@ -1,6 +1,7 @@
 package com.lab.securing_project_tracker.dto.developer;
 
 import com.lab.securing_project_tracker.dto.skill.SkillResponseDto;
+import com.lab.securing_project_tracker.model.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +18,5 @@ public class DeveloperResponseDto {
     private String name;
     private String email;
     private Set<SkillResponseDto> skills;
+    private UserEntity user;
 }
