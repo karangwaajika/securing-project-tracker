@@ -3,6 +3,7 @@ package com.lab.securing_project_tracker.exception;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -67,6 +68,18 @@ public class GlobalException {
     public ResponseEntity<?> handleDeveloperNotFound(DeveloperNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Map.of("Error", e.getMessage()));
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentialsException
+            (BadCredentialsException badCredentialsException, WebRequest webRequest) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("code", HttpStatus.UNAUTHORIZED.value());
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", badCredentialsException.getMessage());
+        body.put("path", webRequest.getContextPath());
+        body.put("sessionId", webRequest.getSessionId());
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
