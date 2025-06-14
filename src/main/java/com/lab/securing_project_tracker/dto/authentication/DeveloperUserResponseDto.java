@@ -7,13 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//this dto is used when user is sub-object of a developer class
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserResponseDto {
+public class DeveloperUserResponseDto {
     private Long id;
     private String username;
     private Role role;
-    private UserDeveloperResponseDto developer;
 }
