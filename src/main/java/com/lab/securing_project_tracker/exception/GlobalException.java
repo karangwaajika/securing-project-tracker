@@ -70,6 +70,12 @@ public class GlobalException {
                 .body(Map.of("Error", e.getMessage()));
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<?> handleUserNotFound(UserNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("Error", e.getMessage()));
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException
             (BadCredentialsException badCredentialsException, WebRequest webRequest) {

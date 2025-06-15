@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface UserService {
     UserResponseDto create(UserRegisterDto userDto);
-    Optional<UserEntity> findByUsername(String username);
+    Optional<UserEntity> findByEmail(String email);
 }

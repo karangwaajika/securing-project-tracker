@@ -4,6 +4,8 @@ import com.lab.securing_project_tracker.dto.authentication.UserRegisterDto;
 import com.lab.securing_project_tracker.dto.developer.DeveloperDto;
 import com.lab.securing_project_tracker.dto.developer.DeveloperResponseDto;
 import com.lab.securing_project_tracker.exception.DeveloperExistsException;
+import com.lab.securing_project_tracker.exception.UserExistsException;
+import com.lab.securing_project_tracker.exception.UserNotFoundException;
 import com.lab.securing_project_tracker.mapper.DeveloperMapper;
 import com.lab.securing_project_tracker.model.DeveloperEntity;
 import com.lab.securing_project_tracker.model.SkillEntity;
@@ -11,6 +13,7 @@ import com.lab.securing_project_tracker.model.UserEntity;
 import com.lab.securing_project_tracker.repository.DeveloperRepository;
 import com.lab.securing_project_tracker.service.DeveloperService;
 import com.lab.securing_project_tracker.service.SkillService;
+import com.lab.securing_project_tracker.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,33 +27,37 @@ public class DeveloperServiceImpl implements DeveloperService {
     SkillService skillService;
     DeveloperRepository developerRepository;
     PasswordEncoder passwordEncoder;
+    UserService userService;
 
     public DeveloperServiceImpl(SkillService skillService,
                                 DeveloperRepository developerRepository,
-                                PasswordEncoder passwordEncoder) {
+                                PasswordEncoder passwordEncoder,
+                                UserService userService) {
         this.skillService = skillService;
         this.developerRepository = developerRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
     @Override
     public DeveloperResponseDto create(DeveloperDto developerDto) {
-
-        if (findDeveloperByEmail(developerDto.getEmail()).isPresent()) {
-            throw new DeveloperExistsException(
-                    String.format("A developer with the email '%s' already exists", developerDto.getEmail()));
-        }
-
-        Set<SkillEntity> skills = new HashSet<>(skillService.findAllById(developerDto.getSkillIds()));
-        DeveloperEntity developer = DeveloperMapper.toEntity(developerDto, skills);
-
         //create user
         UserRegisterDto userDto = developerDto.getUser();
+        if (userDto == null) {
+            throw new UserNotFoundException("Cannot create a developer without a user object");
+        }
+        if (this.userService.findByEmail(userDto.getEmail()).isPresent()) {
+            throw new UserExistsException(
+                    String.format("A user with the email '%s' already exists", userDto.getEmail()));
+        }
         UserEntity userEntity = UserEntity.builder()
-                .username(userDto.getUsername())
+                .email(userDto.getEmail())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .role(userDto.getRole())
                 .build();
+
+        Set<SkillEntity> skills = new HashSet<>(skillService.findAllById(developerDto.getSkillIds()));
+        DeveloperEntity developer = DeveloperMapper.toEntity(developerDto, skills);
 
         developer.setUser(userEntity);          // dev owns FK
         userEntity.setDeveloper(developer);     // inverse side (cascade target)
@@ -65,11 +72,6 @@ public class DeveloperServiceImpl implements DeveloperService {
         return this.developerRepository.findById(id);
     }
 
-    @Override
-    public Optional<DeveloperEntity> findDeveloperByEmail(String email) {
-
-        return this.developerRepository.findDeveloperByEmail(email);
-    }
 
     @Override
     public List<DeveloperResponseDto> findAllDevelopers() {

@@ -37,10 +37,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto create(UserRegisterDto userDto) {
-        if(findByUsername(userDto.getUsername()).isPresent()){
+        if(findByEmail(userDto.getEmail()).isPresent()){
             throw new UserExistsException(
-                    String.format("User with username '%s' exists already",
-                            userDto.getUsername()));
+                    String.format("User with email '%s' exists already",
+                            userDto.getEmail()));
         }
         //extract a developer dto to convert it to developer entity
         DeveloperDto developerDto = userDto.getDeveloper();
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<UserEntity> findByUsername(String username) {
-        return this.userRepository.findByUsername(username);
+    public Optional<UserEntity> findByEmail(String username) {
+        return this.userRepository.findByEmail(username);
     }
 }
