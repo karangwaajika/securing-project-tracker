@@ -1,13 +1,15 @@
 package com.lab.securing_project_tracker.security;
 
+import com.lab.securing_project_tracker.repository.UserRepository;
 import com.lab.securing_project_tracker.security.jwt.JwtAuthenticationFilter;
 import com.lab.securing_project_tracker.security.jwt.JwtAuthorizationFilter;
 import com.lab.securing_project_tracker.security.jwt.JwtUtil;
+import com.lab.securing_project_tracker.security.oauth.OAuth2AuthenticationSuccessHandler;
+import com.lab.securing_project_tracker.service.OAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,11 +27,21 @@ public class ApplicationSecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    UserRepository userRepository;
+    PasswordEncoder passwordEncoder;
+    private final OAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2LoginSuccessHandler;
 
     public ApplicationSecurityConfig(JwtUtil jwtUtil,
-                                     UserDetailsService userDetailsService) {
+                                     UserDetailsService userDetailsService,
+                                     UserRepository userRepository,
+                                     OAuth2UserService customOAuth2UserService,
+                                     OAuth2AuthenticationSuccessHandler oAuth2LoginSuccessHandler) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
     }
 
     // API CHAIN
@@ -67,9 +79,11 @@ public class ApplicationSecurityConfig {
                         .anyRequest().authenticated())
                 .formLogin(form -> form.loginPage("/login"))       // optional classic login
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")                         // same page
-                        .defaultSuccessUrl("/home", true)
-                        .failureUrl("/login?error"))
+                        .loginPage("/login")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2LoginSuccessHandler))
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .invalidateHttpSession(true)
@@ -85,9 +99,18 @@ public class ApplicationSecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+
+
+    // the custom user creation bean
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public OAuth2UserService customOAuth2UserService(UserRepository userRepository,
+                                                     PasswordEncoder passwordEncoder) {
+        return new OAuth2UserService(userRepository, passwordEncoder);
+    }
+
+    @Bean
+    public OAuth2AuthenticationSuccessHandler oAuth2LoginSuccessHandler() {
+        return new OAuth2AuthenticationSuccessHandler(jwtUtil, userRepository);
     }
 
 }

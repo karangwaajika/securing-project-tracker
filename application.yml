@@ -6,4 +6,18 @@ spring:
           github:
             clientId: Ov23liv4yeD6iBZNxD2B
             clientSecret: bcf015747c829e411d728596f1b96dc787b2be30
-            scope: read:user
+            scope:
+                read:user, user: email
+          google:
+            client-id: 687303531562-k4mo6o2cb0ekokr3ai0sln9i6t8rofp5.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - openid
+              - profile
+              - email
+
+logging:
+   level:
+      org.springframework.security: DEBUG
+      org.springframework.security.oauth2: TRACE   # shows user‑info JSON, exceptions
+      com.lab.securing_project_tracker: DEBUG

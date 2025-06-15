@@ -49,8 +49,18 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         OAuth2User principal = (OAuth2User) auth.getPrincipal();
         String email = principal.getAttribute("email");
+        System.out.println("my email"+ email);
+        if (email == null) {
+            // handle missing email case gracefully
+            res.sendRedirect("/login?error=email_not_found");
+            return;
+        }
 
         // role from local DB
+        if(userRepository.findByEmail(email).isEmpty()){
+            System.out.println("not saved");
+        }
+
         Role role = userRepository.findByEmail(email).get().getRole();
         // create a userDetails for token creation
         UserDetails userDetails = new User(
