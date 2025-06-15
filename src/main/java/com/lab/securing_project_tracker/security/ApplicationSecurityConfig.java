@@ -62,7 +62,7 @@ public class ApplicationSecurityConfig {
                         .permitAll()
 
                         .requestMatchers("/api/users/view").hasRole("ADMIN")
-                        .requestMatchers("/api/users/delete/").hasRole("ADMIN")
+                        .requestMatchers("/api/users/delete/*").hasRole("ADMIN")
                 )
                 .exceptionHandling(ex -> ex
                         // 401 when there is *no* or *bad* token
