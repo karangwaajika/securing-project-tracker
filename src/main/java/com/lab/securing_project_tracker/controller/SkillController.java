@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("skills")
+@RequestMapping("api/skills")
 @Tag(name = "Skill Controller", description = "Manage all the Skill's urls")
 public class SkillController {
     SkillService skillService;

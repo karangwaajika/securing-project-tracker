@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("tasks")
+@RequestMapping("api/tasks")
 @Tag(name = "Task Controller", description = "Manage all the Task's urls")
 public class TaskController {
     TaskService taskService;
