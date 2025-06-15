@@ -24,7 +24,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
 public class ApplicationSecurityConfig {
 
     private final JwtUtil jwtUtil;
@@ -59,12 +58,9 @@ public class ApplicationSecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html", "/swagger-ui/**")
                         .permitAll()
-                        .anyRequest().authenticated()
 
-                        .requestMatchers("/api/users/view/**").hasRole("ADMIN")
-                        .requestMatchers("/api/users/delete/**").hasRole("ADMIN")
-
-
+                        .requestMatchers("/api/users/view").hasRole("CONTRACTOR")
+                        .requestMatchers("/api/users/delete/").hasRole("ADMIN")
                 )
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)  // Allow frames from the same origin

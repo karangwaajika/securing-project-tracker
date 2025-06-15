@@ -13,8 +13,6 @@ public class UserMapper {
         dto.setId(userEntity.getId());
         dto.setEmail(userEntity.getEmail());
         dto.setRole(userEntity.getRole());
-        UserDeveloperResponseDto developerResponseDto = DeveloperMapper.toUserDevResponseDto(userEntity.getDeveloper());
-        dto.setDeveloper(developerResponseDto);
 
         return dto;
     }
