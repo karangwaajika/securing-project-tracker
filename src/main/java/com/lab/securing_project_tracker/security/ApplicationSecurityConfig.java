@@ -9,6 +9,7 @@ import com.lab.securing_project_tracker.service.OAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -21,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -59,12 +61,16 @@ public class ApplicationSecurityConfig {
                                 "/swagger-ui.html", "/swagger-ui/**")
                         .permitAll()
 
-                        .requestMatchers("/api/users/view").hasRole("CONTRACTOR")
+                        .requestMatchers("/api/users/view").hasRole("ADMIN")
                         .requestMatchers("/api/users/delete/").hasRole("ADMIN")
                 )
-                .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)  // Allow frames from the same origin
-                )
+                .exceptionHandling(ex -> ex
+                        // 401 when there is *no* or *bad* token
+                        .authenticationEntryPoint(
+                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        // 403 when token is valid but role is insufficient
+                        .accessDeniedHandler((req, res, ae) ->
+                                res.sendError(HttpStatus.FORBIDDEN.value(), "Forbidden")))
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(httpSecurity.getSharedObject(AuthenticationConfiguration.class)), jwtUtil))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(httpSecurity.getSharedObject(AuthenticationConfiguration.class)), jwtUtil, userDetailsService));
         return httpSecurity.build();

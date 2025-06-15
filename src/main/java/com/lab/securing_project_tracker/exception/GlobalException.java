@@ -7,6 +7,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -110,5 +111,15 @@ public class GlobalException {
         body.put("path", webRequest.getContextPath());
         body.put("sessionId", webRequest.getSessionId());
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<Map<String, Object>> handle404(NoHandlerFoundException ex) {
+        Map<String, Object> body = Map.of(
+                "status", 404,
+                "error", "Not Found",
+                "path", ex.getRequestURL()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 }
