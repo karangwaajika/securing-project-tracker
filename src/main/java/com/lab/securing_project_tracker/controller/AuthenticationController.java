@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -67,6 +68,14 @@ public class AuthenticationController {
         final String jwt = this.jwtUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
+    }
+
+    @GetMapping("/oauth2/success")
+    @Operation(summary = "Log in using oauth2",
+            description = "Upon successful credentials, user is authenticated " +
+                          "and a new token is generated")
+    public Map<String,String> success(@RequestParam String token) {
+        return Map.of("token", token);
     }
 }
 

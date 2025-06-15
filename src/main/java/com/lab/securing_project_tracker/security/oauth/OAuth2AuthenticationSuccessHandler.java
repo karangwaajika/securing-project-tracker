@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -74,11 +76,13 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         // Redirect with token in URL
          //res.sendRedirect("/#/oauth-success?token=" + token);
 
-
         //Return JSON
-        res.setContentType("application/json");
-        res.getWriter().write(
-                mapper.writeValueAsString(Map.of("token", token)));
+//        res.setContentType("application/json");
+//        res.getWriter().write(
+//                mapper.writeValueAsString(Map.of("token", token)));
+
+        String encoded = URLEncoder.encode(token, StandardCharsets.UTF_8);
+        res.sendRedirect("/auth/oauth2/success?token=" + encoded);
     }
 
 }
