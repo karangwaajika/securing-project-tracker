@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
@@ -71,7 +72,13 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         String token = jwtUtil.generateToken(userDetails);
 
         // Redirect with token in URL
-         res.sendRedirect("/#/oauth-success?token=" + token);
+         //res.sendRedirect("/#/oauth-success?token=" + token);
+
+
+        //Return JSON
+        res.setContentType("application/json");
+        res.getWriter().write(
+                mapper.writeValueAsString(Map.of("token", token)));
     }
 
 }
