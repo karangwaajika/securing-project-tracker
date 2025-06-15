@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("developers")
+@RequestMapping("api/developers")
 @Tag(name = "Developer Controller", description = "Manage all the Developer's urls")
 public class DeveloperController {
     DeveloperService developerService;
