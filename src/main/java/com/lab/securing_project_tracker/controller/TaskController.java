@@ -15,8 +15,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,15 +66,17 @@ public class TaskController {
         return this.taskService.findAll(pageable);
     }
 
-    @PatchMapping(name = "update_task", path = "/update/{id}")
+    @PreAuthorize("hasRole('DEVELOPER')")
+    @PatchMapping(name = "update_task", path = "/update")
     @Operation(summary = "Update Task",
             description = "The task can be updated partially, " +
                           "it's doesn't necessary required " +
                           "all the fields to be updated")
     public ResponseEntity<TaskResponseDto> updateTask(@RequestBody TaskDto taskDto,
-                                                            @PathVariable Long id){
+                                                      @RequestParam Long taskId,
+                                                      Authentication auth) throws AccessDeniedException {
 
-        TaskEntity updatedTask = this.taskService.partialUpdate(taskDto, id);
+        TaskEntity updatedTask = this.taskService.partialUpdate(taskDto, taskId, auth);
         TaskResponseDto updatedTaskDto = TaskMapper.toResponseDto(updatedTask);
         return ResponseEntity.status(HttpStatus.OK).body(updatedTaskDto);
     }

@@ -18,8 +18,10 @@ import com.lab.securing_project_tracker.util.DeveloperTaskCount;
 import com.lab.securing_project_tracker.util.TaskStatusCount;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,10 +77,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskEntity partialUpdate(TaskDto taskDto, Long id) {
-        TaskEntity taskEntity = findTaskById(id)
+    public TaskEntity partialUpdate(TaskDto taskDto, Long taskId, Authentication auth) throws AccessDeniedException {
+        TaskEntity taskEntity = findTaskById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException(
-                        String.format("A task with the Id '%d' doesn't exist", id)));
+                        String.format("A task with the Id '%d' doesn't exist", taskId)));
+
+        DeveloperEntity dev = taskEntity.getDeveloper();
+        // check whether auth email matches the developer assigned
+        String authEmail = auth.getName();
+        if(!dev.getUser().getEmail().equals(authEmail)){
+            throw new AccessDeniedException("You are not allowed to update this task");
+        }
         if(taskDto.getTitle() != null){
             taskEntity.setTitle(taskDto.getTitle());
         }

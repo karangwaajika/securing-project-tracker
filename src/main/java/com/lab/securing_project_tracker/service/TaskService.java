@@ -8,7 +8,9 @@ import com.lab.securing_project_tracker.util.DeveloperTaskCount;
 import com.lab.securing_project_tracker.util.TaskStatusCount;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +19,7 @@ public interface TaskService {
     Optional<TaskEntity> findTaskById(Long id);
     Optional<TaskEntity> findTaskByTitle(String title);
     Page<TaskResponseDto> findAll(Pageable pageable);
-    TaskEntity partialUpdate(TaskDto taskDto, Long id);
+    TaskEntity partialUpdate(TaskDto taskDto, Long taskId, Authentication auth) throws AccessDeniedException;
     void deleteById(Long id);
     void assignTaskToDeveloper(Long taskId, Long developerId);
     List<TaskResponseDto> findAllByOrderByDueDateAsc();
