@@ -60,6 +60,7 @@ public class ApplicationSecurityConfig {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui.html",
                                 "/swagger-ui/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/me").hasRole("CONTRACTOR")
+                        .requestMatchers("/api/admin/users").hasRole("ADMIN")
                         .requestMatchers("/api/users/view").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
