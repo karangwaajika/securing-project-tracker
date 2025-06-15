@@ -17,7 +17,6 @@ import java.util.Set;
 public class DeveloperResponseDto {
     private Long id;
     private String name;
-    private String email;
     private Set<SkillResponseDto> skills;
     private DeveloperUserResponseDto user;
 }

@@ -19,12 +19,11 @@ public class DeveloperMapper {
         DeveloperResponseDto dto = new DeveloperResponseDto();
         dto.setId(developerEntity.getId());
         dto.setName(developerEntity.getName());
-        dto.setEmail(developerEntity.getEmail());
 
         UserEntity userEntity = developerEntity.getUser();
         DeveloperUserResponseDto userDto = DeveloperUserResponseDto.builder()
                 .id(userEntity.getId())
-                .username(userEntity.getUsername())
+                .email(userEntity.getEmail())
                 .role(userEntity.getRole())
                 .build();
 
@@ -46,7 +45,6 @@ public class DeveloperMapper {
         UserDeveloperResponseDto dto = new UserDeveloperResponseDto();
         dto.setId(developerEntity.getId());
         dto.setName(developerEntity.getName());
-        dto.setEmail(developerEntity.getEmail());
 
         Set<SkillResponseDto> skillDTOs = developerEntity.getSkills().stream()
                 .map(skill -> {
@@ -66,7 +64,6 @@ public class DeveloperMapper {
     public static DeveloperEntity toEntity(DeveloperDto developerDto, Set<SkillEntity> skillsFromDb ) {
         DeveloperEntity dev = new DeveloperEntity();
         dev.setName(developerDto.getName());
-        dev.setEmail(developerDto.getEmail());
         dev.setSkills(new HashSet<>(skillsFromDb));
         return dev;
     }

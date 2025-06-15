@@ -11,7 +11,7 @@ public class UserMapper {
     public static UserResponseDto toDto(UserEntity userEntity) {
         UserResponseDto dto = new UserResponseDto();
         dto.setId(userEntity.getId());
-        dto.setUsername(userEntity.getUsername());
+        dto.setEmail(userEntity.getEmail());
         dto.setRole(userEntity.getRole());
         UserDeveloperResponseDto developerResponseDto = DeveloperMapper.toUserDevResponseDto(userEntity.getDeveloper());
         dto.setDeveloper(developerResponseDto);
@@ -22,7 +22,7 @@ public class UserMapper {
     public static UserEntity toEntity(UserRegisterDto userDto, DeveloperEntity developer) {
 
         return UserEntity.builder()
-                .username(userDto.getUsername())
+                .email(userDto.getEmail())
                 .password(userDto.getPassword())
                 .role(userDto.getRole())
                 .developer(developer)

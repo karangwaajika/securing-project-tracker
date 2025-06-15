@@ -21,7 +21,6 @@ public class DeveloperEntity {
     private Long id;
 
     private String name;
-    private String email;
 
     @ManyToMany(cascade = { CascadeType.MERGE })
     @JoinTable(

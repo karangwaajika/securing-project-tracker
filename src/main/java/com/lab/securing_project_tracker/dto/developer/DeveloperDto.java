@@ -17,7 +17,6 @@ import java.util.Set;
 @Builder
 public class DeveloperDto {
     private String name;
-    private String email;
     private Set<Long> skillIds; // IDs of existing skills
     private UserRegisterDto user;
 }
