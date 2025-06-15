@@ -16,7 +16,7 @@ public class UserDetailsServiceConfig {
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return username -> {
-            Optional<UserEntity> user = userRepository.findByUsername(username);
+            Optional<UserEntity> user = userRepository.findByEmail(username);
             if (user.isEmpty()) {
                 throw new UsernameNotFoundException("User not found");
             }
@@ -24,7 +24,7 @@ public class UserDetailsServiceConfig {
             SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.get().getRole().name());
             return new org.springframework.security.core
                     .userdetails
-                    .User(user.get().getUsername(),
+                    .User(user.get().getEmail(),
                     user.get().getPassword(),
                     Collections.singletonList(authority));
         };

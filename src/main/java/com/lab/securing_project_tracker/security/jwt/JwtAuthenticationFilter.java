@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             UserEntity user = new ObjectMapper()
                     .readValue(request.getInputStream(), UserEntity.class);
             return authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),
+                    .authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(),
                     user.getPassword(), new ArrayList<>()));
         } catch (IOException e) {
             throw new RuntimeException(e);

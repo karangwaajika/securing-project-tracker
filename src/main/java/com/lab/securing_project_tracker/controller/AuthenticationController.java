@@ -61,9 +61,9 @@ public class AuthenticationController {
             @RequestBody AuthenticationRequest authenticationRequest) {
 
         this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+                authenticationRequest.getEmail(), authenticationRequest.getPassword()));
 
-        final UserDetails userDetails = this.userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final UserDetails userDetails = this.userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
         final String jwt = this.jwtUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
