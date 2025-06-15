@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("projects")
+@RequestMapping("api/projects")
 @Tag(name = "Project Controller", description = "Manage all the Project's urls")
 public class ProjectController {
     ProjectService projectService;
@@ -28,6 +29,7 @@ public class ProjectController {
         this.projectService = projectService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PostMapping(name = "add_project", path = "/add")
     @Operation(summary = "Create project",
             description = "This request inserts a project to the database and returns " +
@@ -60,6 +62,7 @@ public class ProjectController {
         return this.projectService.findAll(pageable);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PatchMapping(name = "update_project", path = "/update/{id}")
     @Operation(summary = "Update Project",
             description = "The project can be updated partially, " +
