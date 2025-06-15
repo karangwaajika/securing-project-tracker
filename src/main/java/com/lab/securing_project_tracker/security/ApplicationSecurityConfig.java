@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.HttpStatusAccessDeniedHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration
@@ -58,7 +59,7 @@ public class ApplicationSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui.html",
                                 "/swagger-ui/**").hasRole("ADMIN")
-
+                        .requestMatchers("/api/users/me").hasRole("CONTRACTOR")
                         .requestMatchers("/api/users/view").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -70,8 +71,11 @@ public class ApplicationSecurityConfig {
                         .authenticationEntryPoint(
                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                         // 403 when token is valid but role is insufficient
-                        .accessDeniedHandler((req, res, ae) ->
-                                res.sendError(HttpStatus.FORBIDDEN.value(), "Forbidden")))
+                        .accessDeniedHandler((req, res, ae) -> {
+                            res.setStatus(HttpStatus.FORBIDDEN.value());
+                            res.setContentType("application/json");          // optional
+                            res.getWriter().write("{\"error\":\"Forbidden\"}");
+                        }))
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(httpSecurity.getSharedObject(AuthenticationConfiguration.class)), jwtUtil))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(httpSecurity.getSharedObject(AuthenticationConfiguration.class)), jwtUtil, userDetailsService));
         return httpSecurity.build();
@@ -109,19 +113,6 @@ public class ApplicationSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
-
-
     // the custom user creation bean
-    @Bean
-    public OAuth2UserService customOAuth2UserService(UserRepository userRepository,
-                                                     PasswordEncoder passwordEncoder) {
-        return new OAuth2UserService(userRepository, passwordEncoder);
-    }
-
-    @Bean
-    public OAuth2AuthenticationSuccessHandler oAuth2LoginSuccessHandler() {
-        return new OAuth2AuthenticationSuccessHandler(jwtUtil, userRepository);
-    }
 
 }

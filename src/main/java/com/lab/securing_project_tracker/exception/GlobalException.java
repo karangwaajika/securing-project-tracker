@@ -90,6 +90,7 @@ public class GlobalException {
         return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
     }
 
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException
             (Exception exception, WebRequest webRequest) {
@@ -127,7 +128,7 @@ public class GlobalException {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleUnauthorized(AccessDeniedException ex) {
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Map.of("Error", ex.getMessage()));
     }
 }
