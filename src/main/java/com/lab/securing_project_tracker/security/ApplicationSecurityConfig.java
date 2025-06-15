@@ -56,13 +56,14 @@ public class ApplicationSecurityConfig {
                 .sessionManagement(sm -> sm
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html", "/swagger-ui/**")
-                        .permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui.html",
+                                "/swagger-ui/**").hasRole("ADMIN")
 
                         .requestMatchers("/api/users/view").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/delete/*").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
                         // 401 when there is *no* or *bad* token
