@@ -13,10 +13,13 @@ import com.lab.securing_project_tracker.model.UserEntity;
 import com.lab.securing_project_tracker.repository.UserRepository;
 import com.lab.securing_project_tracker.service.SkillService;
 import com.lab.securing_project_tracker.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -67,5 +70,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<UserEntity> findByEmail(String username) {
         return this.userRepository.findByEmail(username);
+    }
+
+    @Override
+    public Page<UserResponseDto> findAll(Pageable pageable) {
+        Page<UserEntity> users = this.userRepository.findAll(pageable);
+        return users.map(UserMapper::toDto);
     }
 }
